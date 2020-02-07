@@ -49,6 +49,7 @@ High (Even though it's not critical path, it's completely broken -- but discuss 
 
 ___________
 Bug: Special Character "\" is are not supported in password
+Prereq: $PORT must be set as env var
 Reproduction Steps
 1. Start the hashserve service
 2. Send in a curl request to hash a password that contains a backslash
@@ -77,6 +78,7 @@ High (assuming this SHOULD be supported)
 
 ___________
 Bug: Password parameter and value should be required fields
+Prereq: $PORT must be set as env var
 Reproduction Steps
 1. Start the hashserve service
 2. Send in a curl request to hash a password but leave the password parameter and value empty.
@@ -104,6 +106,7 @@ Medium
 
 ___________
 Bug: /stats endpoint should return error when data is passed in 
+Prereq: $PORT must be set as env var
 Reproduction Steps
 1. Start the hashserve service
 2. Send in a curl request to the /stats endpoint that includes data
@@ -128,7 +131,7 @@ Low
 Severity
 Low
 
-
+___________
 Feature Request: Password Hashing Service should listen on HTTPS
 (In real life, this would be a conversation with the TPM first. It also assumes that a use case for this is a publicly accessible server.)
 Given that the function of the hashserve is to encrypt passwords, we should be update the server to accept the HTTPS protocol. The HTTP protocol

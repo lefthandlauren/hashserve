@@ -1,0 +1,570 @@
+{
+	"info": {
+		"_postman_id": "1c95d75f-7dae-4d97-9fd5-1800b5e7603d",
+		"name": "hashserve",
+		"description": "Lauren's collection of tests against the broken hashserve app for JumpCloud.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/hash Happy Path Tests",
+			"item": [
+				{
+					"name": "Hash password: Sanity Check",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1d6d2186-cfbd-4f51-a761-e65555faa036",
+								"exec": [
+									"// I know your tech stack includes JS, so a test to check type can protect against unintended mutations",
+									"pm.test(\"Job ID returned\", function(){",
+									"    var response = pm.response;",
+									"    typeof(response) === \"number\";",
+									"});",
+									"",
+									"// This is a bit of an anti-pattern to create dependencies between tests, but the 'Get hash' test is dependent on having at least one job identifier existant in the system since it's hard-coded to 1 and to check against this test's password. Given more time, we could set up a test fixture for the 'Get hash' test or perhaps conditionally run the test only if a job identifier exists.",
+									"postman.setNextRequest('GET /hash/1');"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "c1b40a07-e9cc-4e30-8b3a-358da3659568",
+								"exec": [
+									"console.log(\"Testing password: \" + pm.info.requestName);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"password\":\"angrymonkey\"}"
+						},
+						"url": {
+							"raw": "{{server}}{{port}}/hash",
+							"host": [
+								"{{server}}{{port}}"
+							],
+							"path": [
+								"hash"
+							]
+						},
+						"description": "Positive/happy path tests for /hash endpoing"
+					},
+					"response": []
+				},
+				{
+					"name": "GET /hash/1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d2311327-447c-42b8-a3ab-f61ae685d753",
+								"exec": [
+									"var crypto = require(\"crypto-js\");",
+									"",
+									"pm.test(\"String returned\", function(){",
+									"    var response = pm.response;",
+									"    typeof(response) === \"string\";",
+									"});",
+									"",
+									"pm.test(\"Compare encrypted strings\", function() {",
+									"    var response = pm.response.text();",
+									"    var shaPW = CryptoJS.SHA512(\"angrymonkey\");",
+									"    var encodedPW = shaPW.toString(CryptoJS.enc.Base64);",
+									"    pm.response.to.have.body(encodedPW);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{server}}{{port}}/hash/1",
+							"host": [
+								"{{server}}{{port}}"
+							],
+							"path": [
+								"hash",
+								"1"
+							]
+						},
+						"description": "Send in the job ID to GET the hashsed password"
+					},
+					"response": []
+				},
+				{
+					"name": "GET /stats",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "657b43e6-4143-4573-b19d-e27953c4da10",
+								"exec": [
+									"pm.test(\"Total Requests are returned\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"TotalRequests\");",
+									"});",
+									"",
+									"pm.test(\"Average Time is returned\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"AverageTime\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{server}}{{port}}/stats/1",
+							"host": [
+								"{{server}}{{port}}"
+							],
+							"path": [
+								"stats",
+								"1"
+							]
+						},
+						"description": "GET request and latency stats"
+					},
+					"response": []
+				},
+				{
+					"name": "Shutdown",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "30761144-4321-40ec-999e-80cbc881ecd5",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "shutdown"
+						},
+						"url": {
+							"raw": "{{server}}{{port}}/hash",
+							"host": [
+								"{{server}}{{port}}"
+							],
+							"path": [
+								"hash"
+							]
+						},
+						"description": "Signal the server to shutdown gracefully"
+					},
+					"response": []
+				}
+			],
+			"description": "Success tests against the /hash endpoint. Suite executes a simple test after all calls in this folder verifying the return of a \"Success\" response. This test is applied to the folder level so we don't have to duplicated it across individual tests",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a6a35e77-1837-4a82-ab56-a721aeba8f78",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "8c0fa258-38cc-4db6-b97d-ca5d7d0e5d4a",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status OK\", function(){",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "/hash Negative tests",
+			"item": [
+				{
+					"name": "GET /hash with non-existent job ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d2311327-447c-42b8-a3ab-f61ae685d753",
+								"exec": [
+									"pm.test(\"Non-existent job id returns hash not found\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"Hash not found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{server}}{{port}}/hash/10000",
+							"host": [
+								"{{server}}{{port}}"
+							],
+							"path": [
+								"hash",
+								"10000"
+							]
+						},
+						"description": "Send in the job ID to GET the hashsed password"
+					},
+					"response": []
+				},
+				{
+					"name": "GET /stats/1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "657b43e6-4143-4573-b19d-e27953c4da10",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"url": {
+							"raw": "{{server}}{{port}}/stats/1",
+							"host": [
+								"{{server}}{{port}}"
+							],
+							"path": [
+								"stats",
+								"1"
+							]
+						},
+						"description": "GET request and latency stats"
+					},
+					"response": []
+				},
+				{
+					"name": "GET /stats with data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "657b43e6-4143-4573-b19d-e27953c4da10",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"password\":\"angrymonkey\"}"
+						},
+						"url": {
+							"raw": "{{server}}{{port}}/stats",
+							"host": [
+								"{{server}}{{port}}"
+							],
+							"path": [
+								"stats"
+							]
+						},
+						"description": "GET request and latency stats"
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "64a33099-29a2-4997-a466-bf5597569363",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "319e1e77-9feb-49d3-adf1-ec5193897b1f",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status Failed\", function(){",
+							"    pm.expect(pm.response.code).to.be.oneOf([400,404]);",
+							"});"
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Password Content: (requires Positive-Password-List.csv fixture)",
+			"item": [
+				{
+					"name": "Positive Password Test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1d6d2186-cfbd-4f51-a761-e65555faa036",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "7388b36f-c5bc-4677-8af7-1f9747e3499c",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{{value}}"
+						},
+						"url": {
+							"raw": "{{server}}{{port}}/hash",
+							"host": [
+								"{{server}}{{port}}"
+							],
+							"path": [
+								"hash"
+							]
+						},
+						"description": "Positive/happy path tests for /hash endpoing"
+					},
+					"response": []
+				}
+			],
+			"description": "These tests must be run using the data fixture provided, which is a list of passwords containing different test scenarios. \nIn Postman Runner:\n1. Select the collection\n2. Select \"hashserve\" environment\n3. Click \"Select File\" and choose \"Positive-Password-List.csv\" file for \"Positive Test\"\n4. Verify iteration count updates to >1\n5. Click Start Run",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "7435cf32-994d-4590-b10c-5b033f6a5ba7",
+						"type": "text/javascript",
+						"exec": [
+							"console.log(\"Password under test: \" + data.value);"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "338882fd-30ad-486b-92f8-f3b18bb5a192",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status OK\", function(){",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Job ID returned\", function(){",
+							"    var response = pm.response;",
+							"    typeof(response) === \"number\";",
+							"});",
+							"",
+							"pm.test(data.value, function(){",
+							"    typeof(data.value) === \"string\";",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Password Content: (requires Negative-Password-List.csv fixture)",
+			"item": [
+				{
+					"name": "Negative Password Test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1d6d2186-cfbd-4f51-a761-e65555faa036",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "7388b36f-c5bc-4677-8af7-1f9747e3499c",
+								"exec": [
+									"console.log(\"Password under test: \" + data.value);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{{value}}"
+						},
+						"url": {
+							"raw": "{{server}}{{port}}/hash",
+							"host": [
+								"{{server}}{{port}}"
+							],
+							"path": [
+								"hash"
+							]
+						},
+						"description": "Positive/happy path tests for /hash endpoint"
+					},
+					"response": []
+				}
+			],
+			"description": "These tests must be run using the data fixture provided, which is a list of passwords containing different test scenarios. \nIn Postman Runner:\n1. Select the collection\n2. Select \"hashserve\" environment\n3. Click \"Select File\" and choose \"Negative-Password-List.txt\" file for \"Negative Test\"\n4. Click Start Run",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "e697c196-6c99-40fc-9ed9-40285cfc6f05",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "182d27c7-4a50-460b-a344-a409abf93e4a",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Invalid password, expect failure\", function(){",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"pm.test(data.value, function(){",
+							"    typeof(data.value) === \"string\";",
+							"});"
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "895e872c-e424-4285-ac1c-1f70e53c5ee0",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "37d720cf-8da7-447c-9fb3-1e82beeac1b3",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
