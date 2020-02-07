@@ -49,6 +49,7 @@ High (Even though it's not critical path, it's completely broken -- but discuss 
 
 ___________
 Bug: Special Character "\" is are not supported in password
+Prereq: $PORT must be set as env var
 Reproduction Steps
 1. Start the hashserve service
 2. Send in a curl request to hash a password that contains a backslash
@@ -77,6 +78,7 @@ High (assuming this SHOULD be supported)
 
 ___________
 Bug: Password parameter and value should be required fields
+Prereq: $PORT must be set as env var
 Reproduction Steps
 1. Start the hashserve service
 2. Send in a curl request to hash a password but leave the password parameter and value empty.
@@ -101,6 +103,33 @@ Medium
 
 Severity
 Medium
+
+___________
+Bug: /stats endpoint should return error when data is passed in 
+Prereq: $PORT must be set as env var
+Reproduction Steps
+1. Start the hashserve service
+2. Send in a curl request to the /stats endpoint that includes data
+Example: curl -X POST -H "application/json" -d '{"password":"something"}' http://127.0.0.1:2000/stats
+
+Results
+The stats endpoint returns {"TotalRequests":0,"AverageTime":0}
+
+Expected Results
+The stats endpoing should return an error. This endpoint does not accept data. 
+
+Environment
+Hashserve version 0c3d817
+Mac 10.13.6, bash shell, test environment
+
+Impact
+Low -- but we should provide useful error messages when possible for ease of use
+
+Priority
+Low
+
+Severity
+Low
 
 ___________
 Feature Request: Password Hashing Service should listen on HTTPS
