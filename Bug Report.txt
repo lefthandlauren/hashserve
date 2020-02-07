@@ -132,6 +132,31 @@ Severity
 Low
 
 ___________
+Bug? Hitting /stats with invalid request produces 404 Page Not Found response
+1. Start the hashserve service
+2. Send in a curl request to the /stats endpoint that includes and invalid URL
+Example: curl http://127.0.0.1:2000/stats/1
+
+Results
+404 Page Not Found Response returns.
+
+Expected Results
+Discuss with TPM and team. Does this error response make sense? The /hash endpoint returns a 400, so it's a bit inconsistent.
+
+Environment
+Hashserve version 0c3d817
+Mac 10.13.6, bash shell, test environment
+
+Impact
+This error message may be confusing to users.
+
+Priority
+Low
+
+Severity
+Low
+
+___________
 Feature Request: Password Hashing Service should listen on HTTPS
 (In real life, this would be a conversation with the TPM first. It also assumes that a use case for this is a publicly accessible server.)
 Given that the function of the hashserve is to encrypt passwords, we should be update the server to accept the HTTPS protocol. The HTTP protocol

@@ -17,13 +17,18 @@
 							"script": {
 								"id": "1d6d2186-cfbd-4f51-a761-e65555faa036",
 								"exec": [
-									"// I know your tech stack includes JS, so a test to check type can protect against unintended mutations",
+									"/* I know your tech stack includes JavaScript, so I've added several tests to check ",
+									"repsonse type to protect against unintended mutations */",
 									"pm.test(\"Job ID returned\", function(){",
 									"    var response = pm.response;",
 									"    typeof(response) === \"number\";",
 									"});",
 									"",
-									"// This is a bit of an anti-pattern to create dependencies between tests, but the 'Get hash' test is dependent on having at least one job identifier existant in the system since it's hard-coded to 1 and to check against this test's password. Given more time, we could set up a test fixture for the 'Get hash' test or perhaps conditionally run the test only if a job identifier exists.",
+									"/* This is a bit of an anti-pattern to create dependencies between tests, but the 'Get",
+									"hash/1' test is dependent on having at least one job identifier existant in the system ",
+									"since it's hard-coded to 1 and to check against this test's password. So this call ensure",
+									"it'll run next. Given more time, we could set up a test fixture for the 'Get hash' test",
+									"or perhaps conditionally run the test only if a job identifier exists. */",
 									"postman.setNextRequest('GET /hash/1');"
 								],
 								"type": "text/javascript"
@@ -73,6 +78,10 @@
 							"script": {
 								"id": "d2311327-447c-42b8-a3ab-f61ae685d753",
 								"exec": [
+									"/* Verifying the password is actually a SHA512 + Base64 encoded string. This is critical",
+									"path functionality, but a simple comparision is adequate. We don't need to ensure it only",
+									"has only valid Base64 characters, for example, because then we get into testing third",
+									"party functionality. */",
 									"var crypto = require(\"crypto-js\");",
 									"",
 									"pm.test(\"String returned\", function(){",
@@ -122,6 +131,7 @@
 							"script": {
 								"id": "657b43e6-4143-4573-b19d-e27953c4da10",
 								"exec": [
+									"/* This is a smoke test to ensure the two pieces of data are returned, but if I'd had more time I'd like to set up a test that can actually check the values returned here. I'd do that by figuring out a way to restart the service fresh so I could send in a known number of requests, grab their response times, average them in the test, and compare the return value here. */ ",
 									"pm.test(\"Total Requests are returned\", function () {",
 									"    pm.expect(pm.response.text()).to.include(\"TotalRequests\");",
 									"});",
@@ -145,13 +155,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{server}}{{port}}/stats/1",
+							"raw": "{{server}}{{port}}/stats",
 							"host": [
 								"{{server}}{{port}}"
 							],
 							"path": [
-								"stats",
-								"1"
+								"stats"
 							]
 						},
 						"description": "GET request and latency stats"
@@ -211,6 +220,12 @@
 						"id": "8c0fa258-38cc-4db6-b97d-ca5d7d0e5d4a",
 						"type": "text/javascript",
 						"exec": [
+							"/* Status checks are lightweight ways to smoke test an endpoint and ensure a code change hasn't ",
+							"utterly broken the endpoint. I put this on the Collection level because I was thinking about ",
+							"maintainability -- one place to update this test for many calls. However, in my \"Areas for ",
+							"Improvement\" section I mention organization could be done differently. In this case, this test ",
+							"is across multiple endpoints, so if you deprecated an endpoint you'd have to re-org the calls out ",
+							"of this folder because they would fail this test. */",
 							"pm.test(\"Status OK\", function(){",
 							"    pm.response.to.have.status(200);",
 							"});"
@@ -221,7 +236,7 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "/hash Negative tests",
+			"name": "Negative tests",
 			"item": [
 				{
 					"name": "GET /hash with non-existent job ID",
@@ -231,6 +246,8 @@
 							"script": {
 								"id": "d2311327-447c-42b8-a3ab-f61ae685d753",
 								"exec": [
+									"/*Ensure proper failure with clear message to user*/ ",
+									"",
 									"pm.test(\"Non-existent job id returns hash not found\", function () {",
 									"    pm.expect(pm.response.text()).to.include(\"Hash not found\");",
 									"});"
@@ -298,50 +315,6 @@
 						"description": "GET request and latency stats"
 					},
 					"response": []
-				},
-				{
-					"name": "GET /stats with data",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "657b43e6-4143-4573-b19d-e27953c4da10",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"type": "text",
-								"value": "application/x-www-form-urlencoded"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"password\":\"angrymonkey\"}"
-						},
-						"url": {
-							"raw": "{{server}}{{port}}/stats",
-							"host": [
-								"{{server}}{{port}}"
-							],
-							"path": [
-								"stats"
-							]
-						},
-						"description": "GET request and latency stats"
-					},
-					"response": []
 				}
 			],
 			"event": [
@@ -361,6 +334,8 @@
 						"id": "319e1e77-9feb-49d3-adf1-ec5193897b1f",
 						"type": "text/javascript",
 						"exec": [
+							"/* Ensure system fails when invalid data is supplied. */",
+							"",
 							"pm.test(\"Status Failed\", function(){",
 							"    pm.expect(pm.response.code).to.be.oneOf([400,404]);",
 							"});"
@@ -423,7 +398,7 @@
 					"response": []
 				}
 			],
-			"description": "These tests must be run using the data fixture provided, which is a list of passwords containing different test scenarios. \nIn Postman Runner:\n1. Select the collection\n2. Select \"hashserve\" environment\n3. Click \"Select File\" and choose \"Positive-Password-List.csv\" file for \"Positive Test\"\n4. Verify iteration count updates to >1\n5. Click Start Run",
+			"description": "These tests must be run using the data fixture provided, which is a list of passwords containing different test scenarios. \nIn Postman Runner:\n1. Select the collection\n2. Select \"hashserve\" environment\n3. Click \"Select File\" and choose \"Positive-Password-List.csv\" file for \"Positive Test\"\n4. Click Start Run",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -441,6 +416,13 @@
 						"id": "338882fd-30ad-486b-92f8-f3b18bb5a192",
 						"type": "text/javascript",
 						"exec": [
+							"/* I structured this test to be maintainable and readable. It consumes a data fixture containing ",
+							"all the passwords tested that should be allowed. If you want to modify the content or just see ",
+							"what's tested, you just look at the \"Positive-Password-List.csv\" file. This also prints out the ",
+							"value under test into the test results for further readability. An area of exansion would be to ",
+							"include double or multi byte characters. This is critical path functionality and a failure here ",
+							"could cause a hotfix. Please review the password list to see all the scenarios. */ ",
+							"",
 							"pm.test(\"Status OK\", function(){",
 							"    pm.response.to.have.status(200);",
 							"});",
@@ -513,7 +495,7 @@
 					"response": []
 				}
 			],
-			"description": "These tests must be run using the data fixture provided, which is a list of passwords containing different test scenarios. \nIn Postman Runner:\n1. Select the collection\n2. Select \"hashserve\" environment\n3. Click \"Select File\" and choose \"Negative-Password-List.txt\" file for \"Negative Test\"\n4. Click Start Run",
+			"description": "These tests must be run using the data fixture provided, which is a list of passwords containing different test scenarios. \nIn Postman Runner:\n1. Select the collection\n2. Select \"hashserve\" environment\n3. Click \"Select File\" and choose \"Negative-Password-List.csv\" file for \"Negative Test\"\n4. Click Start Run",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -531,6 +513,8 @@
 						"id": "182d27c7-4a50-460b-a344-a409abf93e4a",
 						"type": "text/javascript",
 						"exec": [
+							"/*Structured similar to the Positive test, except these are expected to fail. They do not, see bug report. */",
+							"",
 							"pm.test(\"Invalid password, expect failure\", function(){",
 							"    pm.response.to.have.status(400);",
 							"});",
