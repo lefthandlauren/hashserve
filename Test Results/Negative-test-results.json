@@ -1,0 +1,116 @@
+{
+	"id": "3499cbac-a64c-4ef1-9426-298066900b76",
+	"name": "hashserve",
+	"timestamp": "2020-02-07T00:54:36.696Z",
+	"collection_id": "1c95d75f-7dae-4d97-9fd5-1800b5e7603d",
+	"folder_id": "5ac43981-dd45-4040-8dfc-9d3d83e8b3df",
+	"environment_id": "0be59cc6-07cf-490a-a608-76ff43286c35",
+	"totalPass": 3,
+	"totalFail": 1,
+	"results": [
+		{
+			"id": "90c0750a-4fe9-41f9-8e83-b65ee2035c01",
+			"name": "GET /hash with non-existent job ID",
+			"url": "127.0.0.1:2000/hash/10000",
+			"time": 2,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Status Failed": true,
+				"Non-existent job id returns hash not found": true
+			},
+			"testPassFailCounts": {
+				"Status Failed": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Non-existent job id returns hash not found": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				2
+			],
+			"allTests": [
+				{
+					"Status Failed": true,
+					"Non-existent job id returns hash not found": true
+				}
+			]
+		},
+		{
+			"id": "a6143577-e704-4bf7-85ba-9c1b167cb285",
+			"name": "GET /stats/1",
+			"url": "127.0.0.1:2000/stats/1",
+			"time": 2,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {
+				"Status Failed": true
+			},
+			"testPassFailCounts": {
+				"Status Failed": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				2
+			],
+			"allTests": [
+				{
+					"Status Failed": true
+				}
+			]
+		},
+		{
+			"id": "57e230a7-cfc4-4f40-a017-20313427a4c4",
+			"name": "GET /stats with data",
+			"url": "127.0.0.1:2000/stats",
+			"time": 2,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status Failed": false
+			},
+			"testPassFailCounts": {
+				"Status Failed": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				2
+			],
+			"allTests": [
+				{
+					"Status Failed": false
+				}
+			]
+		}
+	],
+	"count": 1,
+	"collection": {
+		"requests": [
+			{
+				"id": "90c0750a-4fe9-41f9-8e83-b65ee2035c01",
+				"method": "GET"
+			},
+			{
+				"id": "a6143577-e704-4bf7-85ba-9c1b167cb285",
+				"method": "GET"
+			},
+			{
+				"id": "57e230a7-cfc4-4f40-a017-20313427a4c4",
+				"method": "GET"
+			}
+		]
+	}
+}
