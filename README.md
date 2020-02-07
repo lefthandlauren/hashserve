@@ -24,7 +24,7 @@ Ensure the hashserve service is running and your port is exported and matches th
 Manual Tests:
 I executed a couple tests manually so I could time box my efforts here. 
 I tested that the service finishes processing an in-flight hash, but rejects incoming requests received after the shutdown signal. This passed.
-I tested the special characters "," and "\" manually because they really didn't play nicely with Postman's data file. The "\" failed (see bug report) and the comma...passed...but I swear it failed initially. Did you include a Heisenbug? 
+I tested the special characters "," and backslash manually because they really didn't play nicely with Postman's data file. The backslash failed (see bug report) and the comma...passed...but I swear it failed initially. Did you include a Heisenbug? 
 
 Areas for Improvement:
 I didn't test double or multi-byte characters. Again, timebox. 
