@@ -1,0 +1,171 @@
+{
+	"id": "2365374e-7742-43d6-b7dd-3044704411c8",
+	"name": "hashserve",
+	"timestamp": "2020-02-07T00:07:44.327Z",
+	"collection_id": "1c95d75f-7dae-4d97-9fd5-1800b5e7603d",
+	"folder_id": "bde45fec-e110-4736-af40-6841b0fa9b98",
+	"environment_id": "0be59cc6-07cf-490a-a608-76ff43286c35",
+	"totalPass": 9,
+	"totalFail": 0,
+	"results": [
+		{
+			"id": "62f10ca0-b12b-4efc-b99f-2c6804106c0c",
+			"name": "Hash password: Sanity Check",
+			"url": "127.0.0.1:2000/hash",
+			"time": 5006,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status OK": true,
+				"Job ID returned": true
+			},
+			"testPassFailCounts": {
+				"Status OK": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Job ID returned": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5006
+			],
+			"allTests": [
+				{
+					"Status OK": true,
+					"Job ID returned": true
+				}
+			]
+		},
+		{
+			"id": "b57bf35e-2c56-4005-930b-77ca410048f1",
+			"name": "GET /hash/1",
+			"url": "127.0.0.1:2000/hash/1",
+			"time": 2,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status OK": true,
+				"String returned": true,
+				"Compare encrypted strings": true
+			},
+			"testPassFailCounts": {
+				"Status OK": {
+					"pass": 1,
+					"fail": 0
+				},
+				"String returned": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Compare encrypted strings": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				2
+			],
+			"allTests": [
+				{
+					"Status OK": true,
+					"String returned": true,
+					"Compare encrypted strings": true
+				}
+			]
+		},
+		{
+			"id": "1ec725ca-2d30-4c46-8cf0-5de9eea49ca5",
+			"name": "GET /stats",
+			"url": "127.0.0.1:2000/stats",
+			"time": 2,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status OK": true,
+				"Total Requests are returned": true,
+				"Average Time is returned": true
+			},
+			"testPassFailCounts": {
+				"Status OK": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Total Requests are returned": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Average Time is returned": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				2
+			],
+			"allTests": [
+				{
+					"Status OK": true,
+					"Total Requests are returned": true,
+					"Average Time is returned": true
+				}
+			]
+		},
+		{
+			"id": "f25e3b38-9e96-40cf-8501-570faaa3930e",
+			"name": "Shutdown",
+			"url": "127.0.0.1:2000/hash",
+			"time": 2,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status OK": true
+			},
+			"testPassFailCounts": {
+				"Status OK": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				2
+			],
+			"allTests": [
+				{
+					"Status OK": true
+				}
+			]
+		}
+	],
+	"count": 1,
+	"collection": {
+		"requests": [
+			{
+				"id": "62f10ca0-b12b-4efc-b99f-2c6804106c0c",
+				"method": "POST"
+			},
+			{
+				"id": "b57bf35e-2c56-4005-930b-77ca410048f1",
+				"method": "GET"
+			},
+			{
+				"id": "1ec725ca-2d30-4c46-8cf0-5de9eea49ca5",
+				"method": "GET"
+			},
+			{
+				"id": "f25e3b38-9e96-40cf-8501-570faaa3930e",
+				"method": "POST"
+			}
+		]
+	}
+}

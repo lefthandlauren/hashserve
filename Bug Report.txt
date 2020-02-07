@@ -1,0 +1,110 @@
+Bug: Incorrect "AverageTime" value returning from /stats endpoint
+**NOTE** This assumes that "AverageTime" is in ms, and that AverageTime calulates the average amount of time for the request to process
+
+Reproduction Steps
+Prereq: $PORT must be set as env var
+1. Start the hashserve service
+2. Send in one POST request to hash a password (if using command line, prepend logging command for time, or use Postman)
+    Example (Mac terminal): time curl -X POST -H "Content-Type: application/json" -d '{"password":"angrymonkey"}' http://127.0.0.1:2000/hash
+    Example output: 1
+                    real	0m5.032s
+                    user	0m0.012s
+                    sys	    0m0.009s
+3. Send a request to the /stats endpoint 
+    Example: curl http://127.0.0.1:2000/stats
+    Example output: {"TotalRequests":1,"AverageTime":538490}
+4. Repeat steps 2 and 3. Manually calculate the average time.
+Example output: 2
+                real	0m5.033s
+                user	0m0.012s
+                sys	0m0.009s
+                {"TotalRequests":2,"AverageTime":403617}
+
+Results 
+The "AverageTime" returned does not correspond with the command line logging. 
+For the first request:
+Command line logging (converted into milliseconds) is 5032. The "AverageTime" value is 538490.
+After the second request: Command line average is (5.032 + 5.033)/2 = 5.0325 or 5032.5 ms
+"AverageTime" value is 403617.
+
+Expected Results
+"AverageTime" should average the processing times of the requests the server has received for this session. It should output the average
+in milliseconds. In this example, expected output would be:
+{"TotalRequests":1,"AverageTime":5032}
+{"TotalRequests":2,"AverageTime":5032.5}
+
+Environment
+Hashserve version 0c3d817
+Mac 10.13.6, bash shell, test environment
+
+Impact
+If a customer sees something like "AverageTime":538490, they may think our hashserve is non-performant, or that it is taxing their server.
+This could generate support requests. 
+
+Priority
+Medium (Fuctional issue, but not critical path functionality - but discuss with TPM)
+
+Severity
+High (Even though it's not critical path, it's completely broken -- but discuss with team)
+
+___________
+Bug: Special Character "\" is are not supported in password
+Reproduction Steps
+1. Start the hashserve service
+2. Send in a curl request to hash a password that contains a backslash
+
+Results
+The request will return a 400 "Malformed Input" response. 
+
+Expected Results
+Commonly used special characters are properly hashed. 
+
+Environment
+Hashserve version 0c3d817
+Mac 10.13.6, bash shell, test environment
+
+Impact
+Backslashes are supported in both Oracle Identity Manager and Microsoft Active Directory. Clients using these services will likely run into issues
+and find our service incompatible. 
+Since our error message in the response is vague, will likely not understand the cause of the issue or how to remedy it. This could poentially generate support 
+requests.
+
+Priority
+Medium
+
+Severity
+High (assuming this SHOULD be supported)
+
+___________
+Bug: Password parameter and value should be required fields
+Reproduction Steps
+1. Start the hashserve service
+2. Send in a curl request to hash a password but leave the password parameter and value empty.
+Example: curl -X POST -H "Content-Type: application/json" -d '{"":""}' http://127.0.0.1:2000/hash
+
+Results
+Response is 200 ok and a job id is returned. If you send the job id to the /hash endpoint, a hash is returned.
+
+Expected Results
+Validate that required fields are send in on the request. Request must include password parameter and value for the parameter. If these are not
+included, return a 400. If possible, include actionable error message indicating the missing data.
+
+Environment
+Hashserve version 0c3d817
+Mac 10.13.6, bash shell, test environment
+
+Impact
+Since we're returning an encoded hash, the user can't tell that it doesn't contain the data they likely think they sent in. Silent failures can cost a lot of time.
+
+Priority
+Medium
+
+Severity
+Medium
+
+___________
+Feature Request: Password Hashing Service should listen on HTTPS
+(In real life, this would be a conversation with the TPM first. It also assumes that a use case for this is a publicly accessible server.)
+Given that the function of the hashserve is to encrypt passwords, we should be update the server to accept the HTTPS protocol. The HTTP protocol
+is acceptable for servers within a secure network. However, to extend the use-cases of this service, supporting the secure protocol would enable
+customers to allow the service to be accessible outside of the network.
